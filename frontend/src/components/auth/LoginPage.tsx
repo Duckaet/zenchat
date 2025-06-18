@@ -1,54 +1,83 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuthStore } from '@/store/auth';
-import { MessageSquare, Sparkles, Zap } from 'lucide-react';
+import { MessageSquare, Sparkles, Zap, Shield, Clock } from 'lucide-react';
 
 export function LoginPage() {
   const { signInWithGoogle } = useAuthStore();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-secondary/20 p-4">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center space-x-2">
-            <div className="p-3 bg-primary text-primary-foreground rounded-2xl">
-              <MessageSquare className="w-8 h-8" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-5" />
+      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      
+      <div className="w-full max-w-md space-y-8 relative z-10">
+        {/* Header */}
+        <div className="text-center space-y-6">
+          <div className="flex items-center justify-center space-x-3">
+            <div className="text-left">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+                ZEN-CHAT
+              </h1>
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              ZEN-CHAT
-            </h1>
           </div>
-          <p className="text-xl text-muted-foreground">
-            your vibe ai chat companion
-          </p>
+          
+          <div className="space-y-2">
+            <h2 className="text-2xl font-semibold text-foreground">
+              Welcome back
+            </h2>
+            <p className="text-muted-foreground">
+              Enter zen mode with AI that gets your vibe
+            </p>
+          </div>
         </div>
 
-        <Card className="border-border/50 backdrop-blur-sm">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Welcome</CardTitle>
-            <CardDescription>
-              Sign in to get 250 free credits 
+        {/* Main Card */}
+        <Card className="border-border/50 backdrop-blur-sm bg-background/80 shadow-xl">
+          <CardHeader className="text-center pb-4">
+            <CardTitle className="text-xl">Sign in to continue</CardTitle>
+            <CardDescription className="text-base">
+              Get <span className="font-semibold text-primary">zero free credits hehe</span> to start chatting
             </CardDescription>
           </CardHeader>
+          
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center space-x-3">
-                <Sparkles className="w-5 h-5 text-primary" />
-                <span>enter zen mode with your very own vibe ai</span>
+            {/* Features */}
+            <div className="grid grid-cols-1 gap-4">
+              <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/30 border border-border/30">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-sm text-foreground">no message limits like t3</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <Zap className="w-5 h-5 text-primary" />
-                <span>inspired by your very own vibe browser </span>
+              
+              <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/30 border border-border/30">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Zap className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-sm text-foreground">cause only free models are available</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <MessageSquare className="w-5 h-5 text-primary" />
-                <span>share your chats anytime</span>
+              
+              <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/30 border border-border/30">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Shield className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-sm text-foreground">local first</span>
               </div>
             </div>
 
+            {/* Cold start warning */}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/20 rounded-lg px-3 py-2 border border-border/30">
+              <Clock className="w-3 h-3" />
+              <span>First response may take a moment due to render's cold startups</span>
+            </div>
+
+            {/* Google Sign In Button */}
             <Button 
               onClick={signInWithGoogle}
-              className="w-full h-12 text-base font-medium"
+              className="w-full h-12 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               size="lg"
             >
               <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
@@ -71,12 +100,21 @@ export function LoginPage() {
               </svg>
               Continue with Google
             </Button>
+
+            {/* Alternative sign in hint */}
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground">
+                Quick, secure, and no password required
+              </p>
+            </div>
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs text-muted-foreground">
-          By continuing, you agree to our Terms of Service and Privacy Policy
-        </p>
+        {/* Footer */}
+        <div className="text-center space-y-2">
+          
+          
+        </div>
       </div>
     </div>
   );
