@@ -1,8 +1,8 @@
-// API Request/Response Types
+
 export interface WebSearchRequest {
   query: string;
   maxResults?: number;
-  freshness?: 'pw' | 'pm' | 'py'; // past week, month, year
+  freshness?: 'pw' | 'pm' | 'py';
 }
 
 export interface WebSearchResult {

@@ -295,7 +295,7 @@ export function ChatSidebar() {
               </Avatar>
               <div className="flex-1 text-left">
                 <p className="text-sm font-medium truncate">
-                  {user?.user_metadata?.full_name || 'Paras Sharma'}
+                  {user?.user_metadata?.full_name || 'User'}
                 </p>
                 <p className="text-xs text-muted-foreground">Free</p>
               </div>

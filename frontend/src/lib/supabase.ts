@@ -8,17 +8,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables. Please check your .env file.');
 }
 
-// Check if the URL is still a placeholder value
+
 if (supabaseUrl.includes('your_supabase_project_url') || supabaseUrl === 'your_supabase_project_url') {
   throw new Error('Please replace VITE_SUPABASE_URL in your .env file with your actual Supabase project URL (e.g., https://your-project-id.supabase.co)');
 }
 
-// Check if the anon key is still a placeholder value
+
 if (supabaseAnonKey.includes('your_supabase_anon_key') || supabaseAnonKey === 'your_supabase_anon_key') {
   throw new Error('Please replace VITE_SUPABASE_ANON_KEY in your .env file with your actual Supabase anon key');
 }
 
-// Validate URL format
+
 try {
   new URL(supabaseUrl);
 } catch (error) {

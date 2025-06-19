@@ -37,27 +37,28 @@ interface ChatState {
   loadSharedChat: (shareToken: string) => Promise<Chat | null>;
    loadMoreMessages: (chatId: string, offset?: number) => Promise<void>;
   clearMessageCache: () => void;
+  
 }
 
 const defaultModels: LLMModel[] = [
   {
     id: 'meta-llama/llama-3.1-8b-instruct:free',
-    name: 'Llama 3.1 8B (Free)',
-    provider: 'openai',
+    name: 'Llama 3.1 8B',
+    provider: 'meta',
     maxTokens: 8192,
     supportedFeatures: { vision: false, functionCalling: false, streaming: true },
   },
   {
-    id: 'deepseek/deepseek-chat:free',
-    name: 'DeepSeek Chat (Free) - 200 daily msgs',
-    provider: 'openai',
+    id: 'deepseek/deepseek-r1-0528-qwen3-8b:free',
+    name: 'DeepSeek r1',
+    provider: 'deepseek',
     maxTokens: 4096,
     supportedFeatures: { vision: false, functionCalling: false, streaming: true },
   },
   {
-    id: 'microsoft/phi-3-mini-128k-instruct:free',
-    name: 'Phi-3 Mini (Free) - Backup',
-    provider: 'openai',
+    id: 'google/gemma-3n-e4b-it:free',
+    name: 'gemma',
+    provider: 'google',
     maxTokens: 4096,
     supportedFeatures: { vision: false, functionCalling: false, streaming: true },
   },
@@ -453,7 +454,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       console.error('Error deleting chat:', error);
     }
   },
-
+  
   updateChatTitle: async (chatId: string, title: string) => {
     try {
     

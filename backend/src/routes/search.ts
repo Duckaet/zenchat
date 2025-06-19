@@ -7,10 +7,7 @@ import { logger } from '../utils/logger';
 const router = express.Router();
 const searchService = new WebSearchService();
 
-/**
- * POST /api/search/web
- * Performs web search with comprehensive error handling
- */
+
 router.post('/web', handleAsyncError(async (req: express.Request, res: express.Response) => {
   const startTime = Date.now();
   

@@ -121,14 +121,15 @@ export function ChatInput({ followUpText, onFollowUpUsed }: ChatInputProps) {
           }}>
             <SelectTrigger 
               className="w-48 h-8 text-xs bg-muted/50 border-border/50"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent
               position="popper"
               side="bottom"
               align="start"
               sideOffset={4}
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
+              >
               {availableModels.map(model => (
                 <SelectItem key={model.id} value={model.id}>
                   <div className="flex items-center gap-2">
@@ -183,7 +184,7 @@ export function ChatInput({ followUpText, onFollowUpUsed }: ChatInputProps) {
 
        
         <form onSubmit={handleSubmit}>
-          <div className="flex items-end gap-3 p-3 bg-muted/30 rounded-2xl border border-border/50 focus-within:border-primary/50 transition-all duration-200 shadow-sm">
+          <div className="flex items-end gap-3 p-3 bg-muted/30 rounded-2xl focus-within:border-primary/50 transition-all duration-200 shadow-sm">
             
             <div className="flex-1">
               <Textarea

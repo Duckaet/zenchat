@@ -60,7 +60,7 @@ class ApiClient {
                 onChunk(parsed.content);
               }
             } catch (e) {
-              // Skip invalid JSON
+              console.error('Error parsing chunk:', e);
             }
           }
         }

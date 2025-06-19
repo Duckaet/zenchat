@@ -37,7 +37,7 @@ export interface FileAttachment {
 export interface LLMModel {
   id: string;
   name: string;
-  provider: 'openai' | 'anthropic' | 'google' | 'mistral';
+  provider: 'openai' | 'meta' | 'google' | 'deepseek' | 'sarvamai';
   maxTokens: number;
   supportedFeatures: {
     vision: boolean;

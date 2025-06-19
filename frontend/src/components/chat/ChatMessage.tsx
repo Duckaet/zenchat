@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Message } from '@/types/chat';
 import { useAuthStore } from '@/store/auth';
 import { useChatStore } from '@/store/chat';
 import {
   Copy,
   GitBranch,
-  User,
+  
   Bot,
 } from 'lucide-react';
 
@@ -57,17 +57,8 @@ export function ChatMessage({ message, isLast, onAddToFollowUp }: ChatMessagePro
     if (onAddToFollowUp) {
       onAddToFollowUp(selectedText);
     }
-    toast.success('Added to follow-up');
   };
 
-  const handleCheckSources = async (selectedText: string) => {
-    try {
-      await navigator.clipboard.writeText(selectedText);
-      toast.success('Text copied for source checking');
-    } catch (error) {
-      toast.error('Failed to copy text');
-    }
-  };
 
   return (
     <>
@@ -87,10 +78,7 @@ export function ChatMessage({ message, isLast, onAddToFollowUp }: ChatMessagePro
           <Avatar className="w-8 h-8 flex-shrink-0 mt-1">
             {isUser ? (
               <>
-                <AvatarImage src={user?.user_metadata?.avatar_url} />
-                <AvatarFallback className="bg-muted text-foreground">
-                  <User className="w-4 h-4" />
-                </AvatarFallback>
+               
               </>
             ) : (
               <AvatarFallback className="bg-muted text-foreground">
@@ -110,7 +98,11 @@ export function ChatMessage({ message, isLast, onAddToFollowUp }: ChatMessagePro
                 {isUser ? (user?.user_metadata?.full_name || 'You') : 'Zennie'}
               </span>
               <time dateTime={message.createdAt} className="text-xs">
-                {format(new Date(message.createdAt), 'HH:mm')}
+                {isUser ? (
+              <>
+                
+              </>
+            ) : format(new Date(message.createdAt), 'HH:mm')}
               </time>
             </div>
 
@@ -173,7 +165,6 @@ export function ChatMessage({ message, isLast, onAddToFollowUp }: ChatMessagePro
 
       <TextSelectionTooltip
         onAddToFollowUp={handleAddToFollowUp}
-        onCheckSources={handleCheckSources}
       />
     </>
   );

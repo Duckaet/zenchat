@@ -55,7 +55,7 @@ class SyncService {
     }
   }
 
-  // Sync cloud changes to local
+  
   async syncFromCloud(userId: string) {
     if (!this.isOnline) return;
 
@@ -82,19 +82,19 @@ private async syncChatsToCloud() {
         
         console.log('Syncing chat:', chatData);
         
-        // ✅ FIXED: Map camelCase to snake_case for Supabase
+        
         const { data, error } = await supabase
           .from('chats')
           .upsert({
             id: chat.id,
             title: chat.title,
-            user_id: chat.userId,           // ✅ userId → user_id
-            created_at: chat.createdAt,     // ✅ createdAt → created_at
-            updated_at: chat.updatedAt,     // ✅ updatedAt → updated_at
-            is_shared: chat.isShared,       // ✅ isShared → is_shared
-            share_token: chat.shareToken,   // ✅ shareToken → share_token
+            user_id: chat.userId,           
+            created_at: chat.createdAt,    
+            updated_at: chat.updatedAt,     
+            is_shared: chat.isShared,       
+            share_token: chat.shareToken,   
             model: chat.model,
-            system_prompt: chat.systemPrompt, // ✅ systemPrompt → system_prompt
+            system_prompt: chat.systemPrompt, 
             metadata: chat.metadata,
           })
           .select();
@@ -106,9 +106,9 @@ private async syncChatsToCloud() {
 
         console.log('Chat synced successfully:', data);
 
-        // Mark as synced
+     
         await db.chats.update(chat.id, {
-          isSynced: 1,  // ✅ Use 1 for synced
+          isSynced: 1,  
           lastSyncedAt: new Date().toISOString()
         });
 
@@ -132,28 +132,27 @@ private async syncMessagesToCloud() {
       try {
         const { isSynced, lastSyncedAt, ...messageData } = message;
         
-        // ✅ FIXED: Map camelCase to snake_case for Supabase
+      
         const { error } = await supabase
           .from('messages')
           .upsert({
             id: message.id,
-            chat_id: message.chatId,        // ✅ chatId → chat_id
+            chat_id: message.chatId,        
             content: message.content,
             role: message.role,
-            created_at: message.createdAt,  // ✅ createdAt → created_at
-            updated_at: message.updatedAt,  // ✅ updatedAt → updated_at
+            created_at: message.createdAt,  
+            updated_at: message.updatedAt,  
             metadata: message.metadata,
-            parent_id: message.parentId,    // ✅ parentId → parent_id
+            parent_id: message.parentId,   
             attachments: message.attachments,
-            is_streaming: message.isStreaming, // ✅ isStreaming → is_streaming
-            token_count: message.tokenCount,   // ✅ tokenCount → token_count
+            is_streaming: message.isStreaming, 
+            token_count: message.tokenCount,   
           });
 
         if (error) throw error;
 
-        // Mark as synced
         await db.messages.update(message.id, {
-          isSynced: 1,  // ✅ Use 1 for synced
+          isSynced: 1,  
           lastSyncedAt: new Date().toISOString()
         });
 

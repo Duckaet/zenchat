@@ -8,10 +8,23 @@ const searchService = new WebSearchService();
 
 
 const FREE_MODELS = [
-  { id: 'meta-llama/llama-3.1-8b-instruct:free', name: 'Llama 3.1 8B', provider: 'Meta' },
-  { id: 'google/gemini-flash-1.5:free', name: 'Gemini Flash 1.5', provider: 'Google' },
-  { id: 'anthropic/claude-3-haiku:free', name: 'Claude 3 Haiku', provider: 'Anthropic' }
+  { 
+    id: 'meta-llama/llama-3.1-8b-instruct:free', 
+    name: 'Llama 3.1 8B', 
+    provider: 'Meta' 
+  },
+  { 
+    id: 'deepseek/deepseek-r1-0528-qwen3-8b:free', 
+    name: 'DeepSeek R1', 
+    provider: 'DeepSeek' 
+  },
+  { 
+    id: 'google/gemma-3n-e4b-it:free', 
+    name: 'gemma', 
+    provider: 'goggle' 
+  }
 ];
+
 
 router.post('/completion', async (req, res) => {
   try {

@@ -24,7 +24,7 @@ export function WebSearch() {
 
     setIsSearching(true);
     try {
-      // TODO: Call your backend API for web search
+     
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/search/web`, {
         method: 'POST',
         headers: {
@@ -46,14 +46,14 @@ export function WebSearch() {
       setResults(data.results || []);
     } catch (error) {
       console.error('Error performing web search:', error);
-      // TODO: Show error toast
+    
     } finally {
       setIsSearching(false);
     }
   };
 
   const handleUseResult = (result: SearchResult) => {
-    // TODO: Add selected result to chat context
+ 
     console.log('Using search result:', result);
   };
 
