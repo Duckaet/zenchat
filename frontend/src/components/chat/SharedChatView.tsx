@@ -4,7 +4,7 @@ import { useChatStore } from '@/store/chat';
 import { ChatMessage } from './ChatMessage';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Share, Copy } from 'lucide-react';
+import { ArrowLeft, Copy } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 export function SharedChatView() {
@@ -20,28 +20,20 @@ export function SharedChatView() {
         setIsLoading(false);
         return;
       }
-
       try {
         setIsLoading(true);
-        console.log('Loading shared chat with token:', token);
-        
         const sharedChat = await loadSharedChat(token);
-        
         if (!sharedChat) {
           setError('Chat not found or no longer shared');
           setIsLoading(false);
           return;
         }
-
-        console.log('Shared chat loaded successfully');
         setIsLoading(false);
       } catch (error) {
-        console.error('Failed to load shared chat:', error);
         setError('Failed to load shared chat');
         setIsLoading(false);
       }
     };
-
     loadChat();
   }, [token, loadSharedChat]);
 
@@ -53,7 +45,7 @@ export function SharedChatView() {
         description: "Share link copied to clipboard",
         duration: 2000,
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Copy failed",
         description: "Could not copy link to clipboard",
@@ -95,12 +87,12 @@ export function SharedChatView() {
 
   return (
     <div className="h-screen flex flex-col bg-background">
-      {/* Header */}
-      <div className="border-b p-4 flex justify-between items-center">
+      
+      <div className="border-b border-border/50 bg-background/80 backdrop-blur-md px-6 py-4 flex justify-between items-center sticky top-0 z-10">
         <div>
-          <h1 className="text-lg font-semibold">{currentChat.title}</h1>
+          <h1 className="text-lg font-semibold text-foreground">{currentChat.title}</h1>
           <p className="text-sm text-muted-foreground">
-            Shared conversation • Read-only
+            Shared conversation • <span className="font-medium">Read-only</span>
           </p>
         </div>
         <div className="flex gap-2">
@@ -119,25 +111,27 @@ export function SharedChatView() {
 
       
       <ScrollArea className="flex-1">
-        <div className="space-y-0">
-          {messages.length === 0 ? (
-            <div className="h-full flex items-center justify-center p-8">
-              <p className="text-muted-foreground">No messages in this chat</p>
-            </div>
-          ) : (
-            messages.map((message, index) => (
-              <ChatMessage
-                key={message.id}
-                message={message}
-                isLast={index === messages.length - 1}
-              />
-            ))
-          )}
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          <div className="space-y-8">
+            {messages.length === 0 ? (
+              <div className="h-full flex items-center justify-center p-8">
+                <p className="text-muted-foreground">No messages in this chat</p>
+              </div>
+            ) : (
+              messages.map((message, index) => (
+                <ChatMessage
+                  key={message.id}
+                  message={message}
+                  isLast={index === messages.length - 1}
+                />
+              ))
+            )}
+          </div>
         </div>
       </ScrollArea>
 
-     
-      <div className="border-t p-4 text-center text-sm text-muted-foreground">
+      
+      <div className="bg-background/90 backdrop-blur-md border-t border-border/50 text-center text-muted-foreground py-4 text-sm">
         This is a read-only shared conversation
       </div>
     </div>

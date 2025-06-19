@@ -366,12 +366,12 @@ export const useChatStore = create<ChatState>((set, get) => ({
               const data = line.slice(6);
               
               if (data === '[DONE]') {
-                // Update final message in IndexedDB
+                
                 await db.messages.update(assistantMessage.id, {
                   content: accumulatedContent,
                   isStreaming: false,
                   updatedAt: new Date().toISOString(),
-                  isSynced: 0, // Mark for sync
+                  isSynced: 0, 
                 });
 
                 set(state => ({
@@ -674,7 +674,7 @@ loadSharedChat: async (shareToken: string) => {
       tokenCount: msg.token_count,
     }));
 
-   w
+   
     set({ 
       currentChat: sharedChat,
       messages,
