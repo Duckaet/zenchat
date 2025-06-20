@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { OpenRouterService } from '../services/llm/openrouter';
 import { WebSearchService } from '../services/websearch';
 import { chatRateLimit } from '../middleware/rateLimit';
@@ -134,7 +134,7 @@ router.post('/completion', chatRateLimit, handleAsyncError(async (req: express.R
   return;
 }));
 
-router.get('/models', (req, res) => {
+router.get('/models', (req: Request, res: Response) => {
   res.json({ 
     models: FREE_MODELS,
     count: FREE_MODELS.length,

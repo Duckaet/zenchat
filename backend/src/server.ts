@@ -1,9 +1,8 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import chatRoutes from './routes/chat';
 import searchRoutes from './routes/search';
-import { globalErrorHandler } from './utils/errors';
 
 dotenv.config();
 
@@ -33,7 +32,7 @@ app.use(express.json({ limit: '10mb' }));
 
 app.set('trust proxy', 1);
 
-app.get('/health', (req, res) => {
+app.get('/health', (req: Request, res: Response) => {
   res.json({ 
     status: 'OK',
     timestamp: new Date().toISOString(),
@@ -42,7 +41,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
   res.json({ 
     message: 'Zen Chat API is running',
     status: 'active',
@@ -55,7 +54,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/search', searchRoutes);
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use('*', (req: Request, res: Response) => {
   res.status(404).json({ 
     error: 'Route not found',
     path: req.originalUrl,
@@ -64,7 +63,22 @@ app.use('*', (req, res) => {
 });
 
 // Global error handler
-app.use(globalErrorHandler);
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error('❌ Global error:', {
+    message: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+    url: req.url,
+    method: req.method,
+    timestamp: new Date().toISOString()
+  });
+  
+  res.status(err.statusCode || 500).json({ 
+    error: process.env.NODE_ENV === 'production' 
+      ? 'Internal server error' 
+      : err.message,
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Graceful shutdown
 const server = app.listen(PORT, HOST, () => {

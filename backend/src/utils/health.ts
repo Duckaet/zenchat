@@ -1,9 +1,14 @@
-import express from 'express';
-import { supabase } from '../lib/supabase';
+import express, { Request, Response } from 'express';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     const health = {
       status: 'OK',

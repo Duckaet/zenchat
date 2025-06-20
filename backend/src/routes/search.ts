@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { WebSearchService } from '../services/websearch';
 import { WebSearchRequest } from '../types/api';
 import { AppError, handleAsyncError } from '../utils/errors';
