@@ -5,8 +5,7 @@ class ApiClient {
   async getModels() {
     const response = await fetch(`${this.baseUrl}/chat/models`);
     return response.json();
-  }
-  async streamChatCompletion(
+  }  async streamChatCompletion(
     messages: any[],
     model: string,
     onChunk: (content: string) => void,
@@ -15,7 +14,17 @@ class ApiClient {
     options?: { needsSearch?: boolean; searchQuery?: string }
   ) {
     try {
-      const response = await fetch(`${this.baseUrl}/chat/completion`, {
+      const url = `${this.baseUrl}/chat/completion`;
+      console.log('Making API request to:', url);
+      console.log('Base URL:', this.baseUrl);
+      console.log('Request payload:', { 
+        messages: messages.length + ' messages', 
+        model,
+        needsSearch: options?.needsSearch || false,
+        searchQuery: options?.searchQuery
+      });
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -26,10 +35,15 @@ class ApiClient {
           needsSearch: options?.needsSearch || false,
           searchQuery: options?.searchQuery
         }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      });      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error Response:', {
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url,
+          errorText
+        });
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
 
       const reader = response.body?.getReader();
