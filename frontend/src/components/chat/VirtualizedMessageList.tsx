@@ -43,10 +43,10 @@ export const VirtualizedMessageList = memo(function VirtualizedMessageList({
     );
   }
 
- 
-  return (
+   return (
     <List
       height={height}
+      width="100%"
       itemCount={messages.length}
       itemSize={ITEM_HEIGHT}
       itemData={itemData}

@@ -27,13 +27,12 @@ export function MessageRenderer({ content, attachments, isStreaming }: MessageRe
 
   return (
     <div className="space-y-4">
-    
       {attachments && attachments.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
           {attachments.map((attachment) => (
             <div
               key={attachment.id}
-              className="group relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-sm transition-shadow"
+              className="group relative overflow-hidden rounded-lg border border-border bg-muted hover:shadow-sm transition-shadow"
             >
               {attachment.type.startsWith('image/') ? (
                 <div className="space-y-2">
@@ -43,7 +42,7 @@ export function MessageRenderer({ content, attachments, isStreaming }: MessageRe
                     className="max-w-xs max-h-48 object-cover rounded-t-lg"
                   />
                   <div className="flex items-center justify-between p-2">
-                    <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Image className="w-3 h-3" />
                       <span>{attachment.name}</span>
                     </div>
@@ -59,9 +58,9 @@ export function MessageRenderer({ content, attachments, isStreaming }: MessageRe
                 </div>
               ) : (
                 <div className="flex items-center gap-2 p-3">
-                  <File className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">{attachment.name}</span>
-                  <span className="text-xs text-gray-500">
+                  <File className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground">{attachment.name}</span>
+                  <span className="text-xs text-muted-foreground">
                     ({(attachment.size / 1024).toFixed(1)} KB)
                   </span>
                 </div>
@@ -71,21 +70,20 @@ export function MessageRenderer({ content, attachments, isStreaming }: MessageRe
         </div>
       )}
 
-
-      <div className={cn("prose prose-sm max-w-none")}>
+      <div className={cn("prose prose-base max-w-none dark:prose-invert")}>
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{
-         
-            code({ node, inline, className, children, ...props }) {
+            code({ className, children, ...props }) {
               const match = /language-(\w+)/.exec(className || '');
               const language = match ? match[1] : '';
               const code = String(children).replace(/\n$/, '');
+              const inline = !match;
 
               return !inline && match ? (
-                <div className="group relative my-4 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                  <div className="flex items-center justify-between px-3 py-2 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                <div className="group relative my-4 overflow-hidden rounded-lg border border-border bg-muted/50">
+                  <div className="flex items-center justify-between px-3 py-2 bg-muted border-b border-border/50">
+                    <span className="text-xs font-medium text-muted-foreground">
                       {language || 'code'}
                     </span>
                     <Button
@@ -103,7 +101,7 @@ export function MessageRenderer({ content, attachments, isStreaming }: MessageRe
                   </div>
                   <div className="overflow-x-auto">
                     <SyntaxHighlighter
-                      style={theme === 'dark' ? oneDark : oneLight}
+                      style={theme === 'dark' ? (oneDark as { [key: string]: React.CSSProperties }) : (oneLight as { [key: string]: React.CSSProperties })}
                       language={language}
                       PreTag="div"
                       className="!mt-0 !mb-0 !bg-transparent"
@@ -114,7 +112,6 @@ export function MessageRenderer({ content, attachments, isStreaming }: MessageRe
                         fontSize: '13px',
                         lineHeight: '1.4',
                       }}
-                      {...props}
                     >
                       {code}
                     </SyntaxHighlighter>
@@ -122,7 +119,7 @@ export function MessageRenderer({ content, attachments, isStreaming }: MessageRe
                 </div>
               ) : (
                 <code
-                  className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-1.5 py-0.5 rounded text-sm font-mono"
+                  className="bg-muted text-foreground px-1.5 py-0.5 rounded text-sm font-mono"
                   {...props}
                 >
                   {children}
@@ -130,7 +127,6 @@ export function MessageRenderer({ content, attachments, isStreaming }: MessageRe
               );
             },
 
-           
             ol({ children, ...props }) {
               return (
                 <ol className="space-y-1 pl-6 my-3 list-decimal" {...props}>
@@ -147,16 +143,15 @@ export function MessageRenderer({ content, attachments, isStreaming }: MessageRe
             },
             li({ children, ...props }) {
               return (
-                <li className="text-gray-800 dark:text-gray-200 leading-relaxed" {...props}>
+                <li className="text-foreground leading-relaxed" {...props}>
                   {children}
                 </li>
               );
             },
 
-         
             table({ children }) {
               return (
-                <div className="my-4 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="my-4 overflow-hidden rounded-lg border border-border">
                   <table className="w-full border-collapse">
                     {children}
                   </table>
@@ -165,68 +160,63 @@ export function MessageRenderer({ content, attachments, isStreaming }: MessageRe
             },
             th({ children }) {
               return (
-                <th className="border-b border-gray-200 dark:border-gray-700 px-3 py-2 bg-gray-50 dark:bg-gray-800 text-left font-medium text-sm text-gray-900 dark:text-gray-100">
+                <th className="border-b border-border px-3 py-2 bg-muted text-left font-medium text-sm text-foreground">
                   {children}
                 </th>
               );
             },
             td({ children }) {
               return (
-                <td className="border-b border-gray-100 dark:border-gray-800 px-3 py-2 text-sm text-gray-800 dark:text-gray-200">
+                <td className="border-b border-border px-3 py-2 text-sm text-foreground">
                   {children}
                 </td>
               );
             },
 
-         
             a({ href, children }) {
               return (
                 <a
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline underline-offset-2"
+                  className="text-primary hover:text-primary/80 underline underline-offset-2"
                 >
                   {children}
                 </a>
               );
             },
 
-         
             blockquote({ children }) {
               return (
-                <blockquote className="my-4 border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 pl-4 py-2 italic text-gray-700 dark:text-gray-300">
+                <blockquote className="my-4 border-l-4 border-border bg-muted/50 pl-4 py-2 italic text-foreground">
                   {children}
                 </blockquote>
               );
             },
 
-          
             h1({ children }) {
-              return <h1 className="text-xl font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100">{children}</h1>;
+              return <h1 className="text-xl font-semibold mt-6 mb-3 text-foreground">{children}</h1>;
             },
             h2({ children }) {
-              return <h2 className="text-lg font-semibold mt-5 mb-2 text-gray-900 dark:text-gray-100">{children}</h2>;
+              return <h2 className="text-lg font-semibold mt-5 mb-2 text-foreground">{children}</h2>;
             },
             h3({ children }) {
-              return <h3 className="text-base font-semibold mt-4 mb-2 text-gray-900 dark:text-gray-100">{children}</h3>;
+              return <h3 className="text-base font-semibold mt-4 mb-2 text-foreground">{children}</h3>;
             },
 
-          
             p({ children }) {
-              return <p className="leading-relaxed text-gray-800 dark:text-gray-200 my-2">{children}</p>;
+              return <p className="leading-relaxed text-foreground my-2">{children}</p>;
             },
           }}
         >
           {content}
         </ReactMarkdown>
-        
-       
+
         {isStreaming && content === '' && (
           <div className="flex items-center gap-1 py-2">
-            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" />
+            <div className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce [animation-delay:-0.3s]" />
+            <div className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce [animation-delay:-0.15s]" />
+            <div className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" />
           </div>
         )}
       </div>

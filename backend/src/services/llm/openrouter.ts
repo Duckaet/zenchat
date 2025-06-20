@@ -43,7 +43,7 @@ export class OpenRouterService {
     } catch (error) {
         console.error(`OpenRouter error with model ${model}:`, error);
         
-        if (error.message.includes('rate limit') || error.message.includes('unavailable')) {
+        if (error instanceof Error && (error.message.includes('rate limit') || error.message.includes('unavailable'))) {
         throw new Error(`Model ${model} is currently unavailable.`);
         }
         

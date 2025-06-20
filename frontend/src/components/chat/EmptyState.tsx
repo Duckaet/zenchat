@@ -3,19 +3,27 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useChatStore } from '@/store/chat';
 import { useAuthStore } from '@/store/auth';
 import {
-
   Code,
-
   PenTool,
   Clock,
-
   Brain,
   Globe,
 } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 
+type Example = {
+  readonly id: string;
+  readonly title: string;
+  readonly category: string;
+};
 
-const EXAMPLES = [
+type Category = {
+  readonly id: string;
+  readonly label: string;
+  readonly icon: React.ComponentType<{ className?: string }>;
+};
+
+const EXAMPLES: readonly Example[] = [
 
   {
     id: 'create-1',
@@ -103,7 +111,7 @@ const EXAMPLES = [
 ] as const;
 
 
-const CATEGORIES = [
+const CATEGORIES: readonly Category[] = [
   { id: 'create', label: 'Create', icon: PenTool },
   { id: 'explore', label: 'Explore', icon: Globe },
   { id: 'code', label: 'Code', icon: Code },
@@ -112,7 +120,7 @@ const CATEGORIES = [
 
 // Memoized and optimized ExampleCard
 const ExampleCard = memo(({ example, onClick }: { 
-  example: typeof EXAMPLES[0]; 
+  example: Example; 
   onClick: (prompt: string) => void; 
 }) => {
   const handleClick = useCallback(() => {
@@ -137,7 +145,7 @@ ExampleCard.displayName = 'ExampleCard';
 
 
 const CategoryButton = memo(({ category, isActive, onClick }: {
-  category: typeof CATEGORIES[0];
+  category: Category;
   isActive: boolean;
   onClick: () => void;
 }) => {

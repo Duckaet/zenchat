@@ -1,17 +1,23 @@
 {
-  "name": "backend",
+  "name": "zenchat-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "AI Chat Backend API",
+  "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "echo \"No tests yet\""
+    "postinstall": "npm run build",
+    "test": "echo \"No tests specified\"",
+    "type-check": "tsc --noEmit"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": ["ai", "chat", "api", "openrouter"],
+  "author": "Paras Sharma",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.53.0",

@@ -68,8 +68,7 @@ export class WebSearchService {
         throw new AppError(`Brave Search API error: ${response.status} ${response.statusText}`, response.status);
       }
 
-      const data: BraveSearchResponse = await response.json();
-      console.log(' Brave Search Response:', JSON.stringify(data, null, 2));
+      const data = await response.json() as BraveSearchResponse;
 
    
       const results = data.web?.results?.slice(0, count) || [];
@@ -95,7 +94,7 @@ export class WebSearchService {
       
       logger.error('Web search failed', {
         query,
-        error: error.message,
+        error: (error instanceof Error ? error.message : String(error)),
         searchTime,
         success: false
       });

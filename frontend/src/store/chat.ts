@@ -419,11 +419,12 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
       } catch (error) {
         console.error('Error sending message:', error);
-        set({ streamingMessageId: null });
-        
-        // Remove the failed assistant message
         set(state => ({
-          messages: state.messages.filter(msg => msg.id !== assistantMessage.id)
+          streamingMessageId: null,
+          // Remove the failed assistant message if it exists
+          messages: state.streamingMessageId 
+            ? state.messages.filter(msg => msg.id !== state.streamingMessageId)
+            : state.messages
         }));
         
         throw error;

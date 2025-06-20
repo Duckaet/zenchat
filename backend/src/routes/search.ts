@@ -37,7 +37,7 @@ router.post('/web', handleAsyncError(async (req: express.Request, res: express.R
       success: true
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       ...searchResponse,
       context: formattedContext,
       responseTime
@@ -48,7 +48,7 @@ router.post('/web', handleAsyncError(async (req: express.Request, res: express.R
     
     logger.error('Search API request failed', {
       query: req.body.query,
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       responseTime,
       success: false
     });
@@ -61,7 +61,7 @@ router.post('/web', handleAsyncError(async (req: express.Request, res: express.R
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Internal server error',
       message: 'Search service temporarily unavailable'

@@ -58,23 +58,22 @@ function MainAppLayout() {
     <AuthGuard>
       <div className="h-screen flex bg-background overflow-hidden relative">
         
-     
+        {/* Fixed floating controls */}
         <div className={cn(
           "fixed top-4 z-50 flex flex-col gap-2 transition-all duration-150 ease-out",
-        
-          !isMobile && isSidebarOpen ? "left-[336px]" : "left-4", 
-          
-          isMobile && "left-4"
+          // On desktop: move right when sidebar is open
+          // On mobile: also move right when sidebar is open (since it overlays)
+          isSidebarOpen ? "left-[336px]" : "left-4"
         )}>
          
-          <div className="bg-background/80 backdrop-blur-md border border-border/50 rounded-xl p-2 shadow-lg hover:shadow-xl transition-shadow duration-200 flex flex-row items-center justify-center gap-2">
+          <div className="bg-background/20 backdrop-blur-[2px] border border-border/20 rounded-xl p-2 shadow-sm hover:bg-background/30 hover:shadow-md transition-all duration-200 flex flex-row items-center justify-center gap-2">
           
             <button
               onClick={toggleSidebar}
               className={cn(
                 "p-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95",
                 "text-muted-foreground hover:text-foreground",
-                "hover:bg-muted/50 group"
+                "hover:bg-background/30 group"
               )}
               title={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
             >
@@ -96,14 +95,14 @@ function MainAppLayout() {
               </div>
             </button>
             
-          
-            <div className="w-px h-6 bg-border/50" />
+            {/* Separator */}
+            <div className="w-px h-6 bg-border/30" />
            
             <ThemeToggle />
           </div>
         </div>
 
-      
+        {/* Sidebar */}
         <div className={cn(
           "relative flex-shrink-0 transition-all duration-150 ease-out",
           isSidebarOpen ? "w-80" : "w-0"
@@ -116,18 +115,18 @@ function MainAppLayout() {
           </div>
         </div>
 
-        
+        {/* Main content */}
         <div className={cn(
           "flex-1 flex flex-col min-w-0 relative",
-        
-          isSidebarOpen ? "w-[calc(100vw-320px)]" : "w-full"
+          // On desktop, adjust width based on sidebar
+          !isMobile && isSidebarOpen ? "w-[calc(100vw-320px)]" : "w-full"
         )}>
           <div className="flex-1 overflow-hidden relative">
             <ChatWindow />
           </div>
         </div>
 
-       
+        {/* Mobile overlay */}
         {isMobile && isSidebarOpen && (
           <div 
             className="fixed inset-0 bg-black/20 z-20 transition-opacity duration-150 ease-out"
