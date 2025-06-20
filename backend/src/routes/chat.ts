@@ -28,19 +28,19 @@ const FREE_MODELS = [
 ];
 
 // Apply rate limiting to chat completion
-router.post('/completion', chatRateLimit, handleAsyncError(async (req: express.Request, res: express.Response) => {
+router.post('/completion', chatRateLimit, handleAsyncError(async (req: express.Request, res: express.Response): Promise<void> => {
   const startTime = Date.now();
   
   try {
-    const { messages, model, needsSearch, searchQuery } = req.body;
-
-    // Input validation
+    const { messages, model, needsSearch, searchQuery } = req.body;    // Input validation
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return res.status(400).json({ error: 'Messages array is required' });
+      res.status(400).json({ error: 'Messages array is required' });
+      return;
     }
 
     if (!model) {
-      return res.status(400).json({ error: 'Model is required' });
+      res.status(400).json({ error: 'Model is required' });
+      return;
     }
 
     logger.info('Chat completion request', { 
@@ -113,7 +113,6 @@ router.post('/completion', chatRateLimit, handleAsyncError(async (req: express.R
       totalTime,
       success: true 
     });
-
   } catch (error) {
     const totalTime = Date.now() - startTime;
     logger.error('Chat completion error', { 
@@ -127,11 +126,8 @@ router.post('/completion', chatRateLimit, handleAsyncError(async (req: express.R
         error: 'Failed to generate response',
         message: process.env.NODE_ENV === 'development' && error instanceof Error ? error.message : 'Internal server error'
       });
-      return;
     }
-    return;
   }
-  return;
 }));
 
 router.get('/models', (req: Request, res: Response) => {
