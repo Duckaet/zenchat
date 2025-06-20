@@ -7,14 +7,18 @@ import searchRoutes from './routes/search';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
-const HOST = '0.0.0.0'; 
+// Fix: Use Render's provided PORT, fallback to 5000 for local dev
+const PORT = process.env.PORT || 5000;
+const HOST = '0.0.0.0';
 
+console.log('🚀 Starting Zen Chat Backend...');
+console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+console.log(`🔧 Port: ${PORT} (from ${process.env.PORT ? 'ENV' : 'default'})`);
 
 const allowedOriginsProd = [
   process.env.FRONTEND_URL,
-  'https://zen-chat-frontend.vercel.app',
-  'https://your-custom-domain.com'
+  process.env.YOUR_SITE_URL,
+  'https://zenchat.parasbuilds.tech',
 ].filter((origin): origin is string => typeof origin === 'string');
 
 const corsOptions = {
@@ -28,24 +32,34 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
-
-
 app.set('trust proxy', 1);
 
+// Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
   res.json({ 
     status: 'OK',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
-    version: '1.0.0'
+    version: '1.0.0',
+    port: PORT,
+    uptime: process.uptime()
   });
 });
 
+// Root endpoint
 app.get('/', (req: Request, res: Response) => {
   res.json({ 
-    message: 'Zen Chat API is running',
-    status: 'active',
-    endpoints: ['/api/chat', '/api/search', '/health']
+    message: 'Zen Chat API',
+    status: 'running',
+    version: '1.0.0',
+    port: PORT,
+    endpoints: {
+      health: '/health',
+      chat: '/api/chat',
+      models: '/api/chat/models',
+      search: '/api/search'
+    },
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -58,7 +72,8 @@ app.use('*', (req: Request, res: Response) => {
   res.status(404).json({ 
     error: 'Route not found',
     path: req.originalUrl,
-    availableRoutes: ['/api/chat', '/api/search', '/health']
+    method: req.method,
+    availableRoutes: ['/health', '/api/chat', '/api/search']
   });
 });
 
@@ -80,28 +95,23 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-// Graceful shutdown
+// Start server
 const server = app.listen(PORT, HOST, () => {
-  console.log(`🚀 Zen Chat API running on ${HOST}:${PORT}`);
-  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`✅ Server running on ${HOST}:${PORT}`);
   console.log(`🔍 Health check: http://${HOST}:${PORT}/health`);
+  console.log(`📡 API base: http://${HOST}:${PORT}/api`);
 });
 
-// Handle shutdown signals
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
+// Graceful shutdown
+const gracefulShutdown = () => {
+  console.log('📴 Received shutdown signal, closing server gracefully...');
   server.close(() => {
-    console.log('Process terminated');
+    console.log('✅ Server closed successfully');
     process.exit(0);
   });
-});
+};
 
-process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully');  
-  server.close(() => {
-    console.log('Process terminated');
-    process.exit(0);
-  });
-});
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
 
 export default app;

@@ -1,6 +1,6 @@
 // API client for your Express backend
 class ApiClient {
-  private baseUrl = 'http://localhost:5000/api';
+  private baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
   async getModels() {
     const response = await fetch(`${this.baseUrl}/chat/models`);
@@ -44,7 +44,7 @@ class ApiClient {
 
         const chunk = decoder.decode(value);
         const lines = chunk.split('\n');
-
+        
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             const data = line.slice(6);
