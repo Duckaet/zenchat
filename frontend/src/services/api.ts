@@ -1,6 +1,29 @@
 // API client for your Express backend
 class ApiClient {
-  private baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+  private baseUrl: string;
+
+  constructor() {
+    // Get base URL from environment with robust fallback
+    const envUrl = import.meta.env.VITE_API_BASE_URL;
+    const defaultUrl = 'http://localhost:5000/api';
+    
+    if (!envUrl) {
+      console.warn('VITE_API_BASE_URL not found, using default:', defaultUrl);
+      this.baseUrl = defaultUrl;
+    } else {
+      // Ensure the URL ends with /api if it doesn't already
+      if (envUrl.endsWith('/api')) {
+        this.baseUrl = envUrl;
+      } else if (envUrl.includes('/api/')) {
+        this.baseUrl = envUrl;
+      } else {
+        this.baseUrl = envUrl + '/api';
+      }
+    }
+    
+    console.log('API Client initialized with baseUrl:', this.baseUrl);
+    console.log('Environment VITE_API_BASE_URL:', envUrl);
+  }
 
   async getModels() {
     const response = await fetch(`${this.baseUrl}/chat/models`);
