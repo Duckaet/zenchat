@@ -32,7 +32,7 @@ export default defineConfig({
       },
     },
     sourcemap: false,
-    minify: 'terser',
+    minify: 'esbuild', // Use esbuild instead of terser
   },
   server: {
     port: 3000,
