@@ -1,5 +1,6 @@
 import { db, LocalChat, LocalMessage } from '@/services/database';
 import { syncService } from '@/services/sync';
+import { apiClient } from '@/services/api';
 import { create } from 'zustand';
 import { Chat, Message, LLMModel } from '@/types/chat';
 import { supabase } from '@/lib/supabase';
@@ -333,89 +334,83 @@ export const useChatStore = create<ChatState>((set, get) => ({
           content: msg.content,
         }));
 
-        // Send to backend with search parameters
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/chat/completion`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: apiMessages,
-            model: selectedModel.id,
-            needsSearch: options?.needsSearch || false,
-            searchQuery: options?.searchQuery
-          }),
-        });
-
-        if (!response.ok) throw new Error('Failed to send message to AI');
-
-        // Handle streaming response
-        const reader = response.body?.getReader();
-        if (!reader) throw new Error('No response stream');
-
+        // Initialize accumulated content for streaming
         let accumulatedContent = '';
-        const decoder = new TextDecoder();
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+        // Use API client for streaming
+        await apiClient.streamChatCompletion(
+          apiMessages,
+          selectedModel.id,
+          // onChunk callback
+          (chunk: string) => {
+            accumulatedContent += chunk;
+            
+            // Update IndexedDB in real-time
+            db.messages.update(assistantMessage.id, {
+              content: accumulatedContent,
+              updatedAt: new Date().toISOString(),
+            });
 
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
+            // Update state
+            set(state => ({
+              messages: state.messages.map(msg =>
+                msg.id === assistantMessage.id
+                  ? { ...msg, content: accumulatedContent }
+                  : msg
+              ),
+            }));
+          },
+          // onComplete callback
+          () => {
+            // Finalize message
+            db.messages.update(assistantMessage.id, {
+              content: accumulatedContent,
+              isStreaming: false,
+              updatedAt: new Date().toISOString(),
+              isSynced: 0,
+            });
 
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const data = line.slice(6);
-              
-              if (data === '[DONE]') {
-                
-                await db.messages.update(assistantMessage.id, {
-                  content: accumulatedContent,
-                  isStreaming: false,
-                  updatedAt: new Date().toISOString(),
-                  isSynced: 0, 
-                });
+            set(state => ({
+              messages: state.messages.map(msg =>
+                msg.id === assistantMessage.id
+                  ? { ...msg, content: accumulatedContent, isStreaming: false }
+                  : msg
+              ),
+              streamingMessageId: null,
+            }));
 
-                set(state => ({
-                  messages: state.messages.map(msg =>
-                    msg.id === assistantMessage.id
-                      ? { ...msg, content: accumulatedContent, isStreaming: false }
-                      : msg
-                  ),
-                  streamingMessageId: null,
-                }));
-
-                // Sync to cloud in background
-                if (navigator.onLine) {
-                  syncService.syncToCloud();
-                }
-                break;
-              }
-
-              try {
-                const parsed = JSON.parse(data);
-                if (parsed.content) {
-                  accumulatedContent += parsed.content;
-                  
-                  // Update IndexedDB in real-time
-                  await db.messages.update(assistantMessage.id, {
-                    content: accumulatedContent,
-                    updatedAt: new Date().toISOString(),
-                  });
-
-                  // Update state
-                  set(state => ({
-                    messages: state.messages.map(msg =>
-                      msg.id === assistantMessage.id
-                        ? { ...msg, content: accumulatedContent }
-                        : msg
-                    ),
-                  }));
-                }
-              } catch (e) {
-                console.error('Error parsing AI response:', e);
-              }
+            // Sync to cloud in background
+            if (navigator.onLine) {
+              syncService.syncToCloud();
             }
-          }
-        }
+          },
+          // onError callback
+          (error: string) => {
+            console.error('Streaming error:', error);
+            
+            // Update message with error
+            const errorMessage = `Error: ${error}`;
+            db.messages.update(assistantMessage.id, {
+              content: errorMessage,
+              isStreaming: false,
+              updatedAt: new Date().toISOString(),
+              isSynced: 0,
+            });
+
+            set(state => ({
+              messages: state.messages.map(msg =>
+                msg.id === assistantMessage.id
+                  ? { ...msg, content: errorMessage, isStreaming: false }
+                  : msg
+              ),
+              streamingMessageId: null,
+            }));
+
+            throw new Error(error);
+          },
+          // Pass search options
+          options
+        );
 
       } catch (error) {
         console.error('Error sending message:', error);

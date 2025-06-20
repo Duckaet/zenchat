@@ -8,7 +8,7 @@ dotenv.config();
 
 const app = express();
 // Fix: Use Render's provided PORT, fallback to 5000 for local dev
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT) || 5000;
 const HOST = '0.0.0.0';
 
 console.log('🚀 Starting Zen Chat Backend...');
@@ -19,7 +19,10 @@ const allowedOriginsProd = [
   process.env.FRONTEND_URL,
   process.env.YOUR_SITE_URL,
   'https://zenchat.parasbuilds.tech',
-].filter((origin): origin is string => typeof origin === 'string');
+  // Add common Netlify patterns
+  /https:\/\/.*\.netlify\.app$/,
+  /https:\/\/.*--.*\.netlify\.app$/,
+].filter((origin): origin is string | RegExp => origin != null);
 
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production'

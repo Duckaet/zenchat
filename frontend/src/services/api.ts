@@ -6,13 +6,13 @@ class ApiClient {
     const response = await fetch(`${this.baseUrl}/chat/models`);
     return response.json();
   }
-
   async streamChatCompletion(
     messages: any[],
     model: string,
     onChunk: (content: string) => void,
     onComplete: () => void,
-    onError: (error: string) => void
+    onError: (error: string) => void,
+    options?: { needsSearch?: boolean; searchQuery?: string }
   ) {
     try {
       const response = await fetch(`${this.baseUrl}/chat/completion`, {
@@ -20,7 +20,12 @@ class ApiClient {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ messages, model }),
+        body: JSON.stringify({ 
+          messages, 
+          model,
+          needsSearch: options?.needsSearch || false,
+          searchQuery: options?.searchQuery
+        }),
       });
 
       if (!response.ok) {
