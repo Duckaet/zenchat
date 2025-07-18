@@ -16,10 +16,13 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   signInWithGoogle: async () => {
     try {
+      // Get the redirect URL from environment variable or fallback to current origin
+      const redirectUrl = import.meta.env.VITE_AUTH_REDIRECT_URL || window.location.origin;
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin,
+          redirectTo: redirectUrl,
         },
       });
       if (error) throw error;
@@ -43,7 +46,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const { data: { session } } = await supabase.auth.getSession();
       set({ user: session?.user ?? null, loading: false });
 
-      supabase.auth.onAuthStateChange((event, session) => {
+      supabase.auth.onAuthStateChange((_event, session) => {
         set({ user: session?.user ?? null });
       });
     } catch (error) {

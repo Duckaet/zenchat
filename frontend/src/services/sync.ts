@@ -1,6 +1,5 @@
 import { db, LocalChat, LocalMessage } from './database';
 import { supabase } from '@/lib/supabase';
-import { Chat, Message } from '@/types/chat';
 
 class SyncService {
   private isOnline = navigator.onLine;
@@ -78,7 +77,7 @@ private async syncChatsToCloud() {
 
     for (const chat of unsyncedChats) {
       try {
-        const { isSynced, lastSyncedAt, ...chatData } = chat;
+        const { ...chatData } = chat;
         
         console.log('Syncing chat:', chatData);
         
@@ -129,10 +128,7 @@ private async syncMessagesToCloud() {
     console.log(` Syncing ${unsyncedMessages.length} unsynced messages to cloud`);
 
     for (const message of unsyncedMessages) {
-      try {
-        const { isSynced, lastSyncedAt, ...messageData } = message;
-        
-      
+      try {        // Upload message to Supabase
         const { error } = await supabase
           .from('messages')
           .upsert({
@@ -189,7 +185,7 @@ private async syncMessagesToCloud() {
         model: cloudChat.model,
         systemPrompt: cloudChat.system_prompt,
         metadata: cloudChat.metadata,
-        isSynced: true,
+        isSynced: 1,
         lastSyncedAt: new Date().toISOString()
       };
 
@@ -226,7 +222,7 @@ private async syncMessagesToCloud() {
         attachments: cloudMessage.attachments || [],
         isStreaming: cloudMessage.is_streaming,
         tokenCount: cloudMessage.token_count,
-        isSynced: true,
+        isSynced: 1,
         lastSyncedAt: new Date().toISOString()
       };
 
@@ -250,7 +246,7 @@ private async syncMessagesToCloud() {
         model: cloudChat.model,
         systemPrompt: cloudChat.system_prompt,
         metadata: cloudChat.metadata,
-        isSynced: true,
+        isSynced: 1,
         lastSyncedAt: new Date().toISOString()
       };
 
@@ -260,7 +256,7 @@ private async syncMessagesToCloud() {
     }
   }
 
-  private async handleRemoteMessageChange(payload: any) {
+  private async handleRemoteMessageChange(payload: { new: any; old: any; eventType: string }) {
     if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
       const cloudMessage = payload.new;
       const localMessage: LocalMessage = {
@@ -275,7 +271,7 @@ private async syncMessagesToCloud() {
         attachments: cloudMessage.attachments || [],
         isStreaming: cloudMessage.is_streaming,
         tokenCount: cloudMessage.token_count,
-        isSynced: true,
+        isSynced: 1,
         lastSyncedAt: new Date().toISOString()
       };
 

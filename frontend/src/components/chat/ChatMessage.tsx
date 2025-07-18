@@ -1,20 +1,16 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Message } from '@/types/chat';
-import { useAuthStore } from '@/store/auth';
 import { useChatStore } from '@/store/chat';
 import {
   Copy,
   GitBranch,
-  
-  Bot,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { MessageRenderer } from './MessageRenderer';
+import { ElectronicsMessageRenderer } from './ElectronicsMessageRenderer';
 import { TextSelectionTooltip } from './TextSelectionTooltip';
-import { format } from 'date-fns';
 import { toast } from 'sonner';
 
 interface ChatMessageProps {
@@ -24,7 +20,6 @@ interface ChatMessageProps {
 }
 
 export function ChatMessage({ message, isLast, onAddToFollowUp }: ChatMessageProps) {
-  const { user } = useAuthStore();
   const { forkChat, selectChat } = useChatStore();
   const [isHovered, setIsHovered] = useState(false);
 
@@ -35,7 +30,7 @@ export function ChatMessage({ message, isLast, onAddToFollowUp }: ChatMessagePro
     try {
       await navigator.clipboard.writeText(message.content);
       toast.success('Message copied to clipboard');
-    } catch (error) {
+    } catch {
       toast.error('Failed to copy message');
     }
   };
@@ -75,17 +70,6 @@ export function ChatMessage({ message, isLast, onAddToFollowUp }: ChatMessagePro
           isUser ? "flex-row-reverse" : "flex-row"
         )}>
         
-          <Avatar className="w-8 h-8 flex-shrink-0 mt-1">
-            {isUser ? (
-              <>
-               
-              </>
-            ) : (
-              <AvatarFallback className="bg-muted text-foreground">
-                <Bot className="w-4 h-4" />
-              </AvatarFallback>
-            )}
-          </Avatar>
 
        
           <div className="flex-1 min-w-0">
@@ -94,16 +78,6 @@ export function ChatMessage({ message, isLast, onAddToFollowUp }: ChatMessagePro
               "flex items-center gap-2 mb-2 text-sm text-muted-foreground",
               isUser ? "justify-end" : "justify-start"
             )}>
-              <span className="font-medium text-foreground">
-                {isUser ? (user?.user_metadata?.full_name || 'You') : 'Zennie'}
-              </span>
-              <time dateTime={message.createdAt} className="text-xs">
-                {isUser ? (
-              <>
-                
-              </>
-            ) : format(new Date(message.createdAt), 'HH:mm')}
-              </time>
             </div>
 
          
@@ -113,11 +87,20 @@ export function ChatMessage({ message, isLast, onAddToFollowUp }: ChatMessagePro
                 ? "bg-muted text-foreground border border-border/50" 
                 : "text-foreground"
             )}>
-              <MessageRenderer
-                content={message.content}
-                attachments={message.attachments}
-                isStreaming={isStreaming}
-              />
+              {isUser ? (
+                <MessageRenderer
+                  content={message.content}
+                  attachments={message.attachments}
+                  isStreaming={isStreaming}
+                />
+              ) : (
+                <ElectronicsMessageRenderer
+                  content={message.content}
+                  onElectronicsResponse={(response) => {
+                    console.log('Electronics response:', response);
+                  }}
+                />
+              )}
             </div>
 
      
