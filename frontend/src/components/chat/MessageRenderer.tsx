@@ -4,10 +4,11 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from 'next-themes';
 import { FileAttachment } from '@/types/chat';
-import { Copy, Download, File, Image, Check } from 'lucide-react';
+import { Copy, Download, File, Image, Check, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { mathRenderer } from '@/services/math/katex-renderer';
 
 interface MessageRendererProps {
   content: string;
@@ -23,6 +24,26 @@ export function MessageRenderer({ content, attachments, isStreaming }: MessageRe
     await navigator.clipboard.writeText(code);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
+  };
+
+  // Enhanced processing for electronics content
+  const processElectronicsContent = (text: string): string => {
+    // Process inline math expressions
+    let processedText = mathRenderer.renderInlineExpressions(text);
+    
+    // Process circuit analysis patterns
+    processedText = processedText.replace(
+      /\b(KCL|KVL|Ohm's Law|BJT|MOSFET|voltage divider|current divider|amplifier|RC circuit|LC circuit|RLC circuit)\b/gi,
+      '<span class="electronics-term">$1</span>'
+    );
+    
+    // Process value patterns (e.g., "10kΩ", "5V", "2.5mA")
+    processedText = processedText.replace(
+      /(\d+(?:\.\d+)?)\s*([kmugMGnpμ]?)([VIAWΩΩFHzs])/g,
+      '<span class="electronics-value">$1$2$3</span>'
+    );
+    
+    return processedText;
   };
 
   return (
@@ -70,7 +91,7 @@ export function MessageRenderer({ content, attachments, isStreaming }: MessageRe
         </div>
       )}
 
-      <div className={cn("prose prose-base max-w-none dark:prose-invert")}>
+      <div className={cn("prose prose-base max-w-none dark:prose-invert electronics-content")}>
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{
@@ -209,7 +230,7 @@ export function MessageRenderer({ content, attachments, isStreaming }: MessageRe
             },
           }}
         >
-          {content}
+          {processElectronicsContent(content)}
         </ReactMarkdown>
 
         {isStreaming && content === '' && (
@@ -220,6 +241,64 @@ export function MessageRenderer({ content, attachments, isStreaming }: MessageRe
           </div>
         )}
       </div>
+      
+      {/* Electronics-specific styling */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .electronics-content .electronics-term {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
+            position: relative;
+          }
+          
+          .electronics-content .electronics-value {
+            background: #f0f9ff;
+            color: #0369a1;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.375rem;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.875em;
+            border: 1px solid #0ea5e9;
+            font-weight: 500;
+          }
+          
+          .dark .electronics-content .electronics-value {
+            background: #0c4a6e;
+            color: #7dd3fc;
+            border-color: #0ea5e9;
+          }
+          
+          .electronics-content .math-solution {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #fafafa;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+          }
+          
+          .dark .electronics-content .math-solution {
+            background: #1f2937;
+            border-color: #374151;
+          }
+          
+          .electronics-content .circuit-container {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #ffffff;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          }
+          
+          .dark .electronics-content .circuit-container {
+            background: #111827;
+            border-color: #374151;
+          }
+        `
+      }} />
     </div>
   );
 }

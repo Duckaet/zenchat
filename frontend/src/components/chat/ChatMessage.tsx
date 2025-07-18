@@ -9,6 +9,7 @@ import {
 
 import { cn } from '@/lib/utils';
 import { MessageRenderer } from './MessageRenderer';
+import { ElectronicsMessageRenderer } from './ElectronicsMessageRenderer';
 import { TextSelectionTooltip } from './TextSelectionTooltip';
 import { toast } from 'sonner';
 
@@ -86,11 +87,20 @@ export function ChatMessage({ message, isLast, onAddToFollowUp }: ChatMessagePro
                 ? "bg-muted text-foreground border border-border/50" 
                 : "text-foreground"
             )}>
-              <MessageRenderer
-                content={message.content}
-                attachments={message.attachments}
-                isStreaming={isStreaming}
-              />
+              {isUser ? (
+                <MessageRenderer
+                  content={message.content}
+                  attachments={message.attachments}
+                  isStreaming={isStreaming}
+                />
+              ) : (
+                <ElectronicsMessageRenderer
+                  content={message.content}
+                  onElectronicsResponse={(response) => {
+                    console.log('Electronics response:', response);
+                  }}
+                />
+              )}
             </div>
 
      
