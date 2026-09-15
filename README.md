@@ -244,16 +244,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - Test your changes across different screen sizes
 - Ensure offline functionality works as expected
 
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 📬 Contact
-
-Paras Sharma - [@your_twitter](https://twitter.com/your_twitter) - parassharma@example.com
-
-Project Link: [https://github.com/yourusername/zen-chat](https://github.com/yourusername/zen-chat)
-
 ## 🙏 Acknowledgments
 
 - [Shadcn/ui](https://ui.shadcn.com/) for the beautiful component library
